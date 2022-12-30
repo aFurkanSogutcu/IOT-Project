@@ -1,0 +1,146 @@
+<html>
+<head>
+<title>firebase editable table </title>
+
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+
+</head>
+
+<body>
+
+<div class="col-md-6">
+  <form>
+
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" class="form-control" id="name" placeholder="Name">
+    </div>
+    <div class="form-group">
+      <label for="exampleInputEmail1">Email address</label>
+      <input type="email" class="form-control" id="email" placeholder="Enter email">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" class="form-control" id="password" placeholder="password">
+    </div>
+    <button type="submit" id="submit" class="btn btn-primary">Kayıt</button>
+    <button type="order" id="order" class="btn btn-primary">Sipariş Ver</button>
+  </form>
+</div class="veri-goster">
+
+  <button type="submit" id="getData" class="btn btn-primary">Veri Göster</button>
+  <div class="col-md-6">
+  <table class="table table-striped" id='dataTbl'>
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">eMail</th>
+        <th scope="col">Password</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td>isim</td>
+        <td>e posta</td>
+        <td>şifre</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+
+</body>
+</html>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getDatabase, set, ref ,push, child, onValue} from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCOBL1cIRsB8nVyd95ViAMdt8hx58iKv9A",
+    authDomain: "iot-deneme3.firebaseapp.com",
+    databaseURL: "https://iot-deneme3-default-rtdb.firebaseio.com",
+    projectId: "iot-deneme3",
+    storageBucket: "iot-deneme3.appspot.com",
+    messagingSenderId: "177571169203",
+    appId: "1:177571169203:web:e55df40a1fa814672c81c6",
+    measurementId: "G-14R7RMY492"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const database = getDatabase(app);
+
+  function generateRandomIntegerInRange(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+
+  var kullanıcıId = 0;
+  // write data
+  order.addEventListener('click',(e) => {
+    let key = generateRandomIntegerInRange(100, 999);
+    let newKey = key.toString();
+  
+    kullanıcıId=+1;
+    var name = document.getElementById('name').value;  
+    var email = document.getElementById('email').value;  
+    var password = document.getElementById('password').value;  
+
+    const userId = push(child(ref(database), 'users')).key;
+   
+    set(ref(database, 'users/' + kullanıcıId), {
+    name: name,
+    email: email,
+    password : password,
+    newKey: newKey
+   });
+   alert(newKey);
+  });
+  //write data
+  submit.addEventListener('click',(e) => {
+    let key = generateRandomIntegerInRange(100, 999);
+    let newKey = key.toString();
+  
+    kullanıcıId=+1;
+    var name = document.getElementById('name').value;  
+    var email = document.getElementById('email').value;  
+    var password = document.getElementById('password').value;  
+
+    const userId = push(child(ref(database), 'users')).key;
+   
+    set(ref(database, 'users/' + userId), {
+    name: name,
+    email: email,
+    password : password
+   });
+  });
+
+  // read data
+  getData.addEventListener('click',(e) => {
+
+    $('#dataTbl td').remove();
+    var rowNum = 0; 
+    const dbRef = ref(database, 'users/');
+
+    onValue(dbRef, (snapshot) => {
+      snapshot.forEach((childSnapshot) => {
+      const childKey = childSnapshot.key;
+      const childData = childSnapshot.val();
+      // ...
+      rowNum += 1; 
+      var row = "<tr><td>" + rowNum + "</td><td>" + childData.name + "</td><td>" + childData.email + "</td><td>" + childData.password + "</td></tr>"
+
+      $(row).appendTo('#dataTbl');
+      
+      });
+    }, {
+       onlyOnce: true
+    });
+  });
+</script>
